@@ -1,14 +1,14 @@
 <?php
-
+require_once 'Validation.php';
 class Client
 /* 
 * Class for Client inserting, updating and editing.
 */ 
 {
     public $dbserver = 'localhost';
-    public $dbname = 'root';
-    public $dbuser = '';
-    public $dbpass = 'client_management_system';
+    public $dbuser = 'root';
+    public $dbpass = '';
+    public $dbname = 'client';
 
     public $id;
     public $firstname;
@@ -50,7 +50,8 @@ class Client
     public function insert()
     {
         $mysqli = new mysqli($dbserver, $dbuser, $dbpass, $dbname);
-        $query = $mysqli->real_escape_string($this->firstname);
+        $query = $mysqli->real_escape_string("INSERT INTO users (firstname, lastname, email, phonenumber1, phonenumber2, comment) VALUES
+                                            ('$this->firstname', '$this->lastname', '$this->email', '$this->phonenumber1', '$this->phonenumber2', '$this->comment')");
         var_dump($query);
         return $query;
     }
