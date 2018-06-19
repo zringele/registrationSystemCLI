@@ -16,8 +16,8 @@ switch ($_GET['action'])
         echo $client->update();
         break;
     case 'import':
-        // $client = new Client($_GET);
-        // echo $client->insert();
+        $client = new Client($_GET);
+        echo $client->import();
         break;
     case 'delete':
         $client = new Client($_GET);

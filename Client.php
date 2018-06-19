@@ -1,5 +1,6 @@
 <?php
 require_once 'Validation.php';
+require_once 'Import.php';
 class Client
 /* 
 * Class for Client inserting, updating and editing.
@@ -11,6 +12,16 @@ class Client
     private $dbname = 'cms';
 
     private $message;
+    private $file;
+    private $arrayStructure = array(
+        'id',
+        'firstname',
+        'lastname',
+        'email',
+        'phonenumber1',
+        'phonenumber2',
+        'comment'
+    );
 
     public $id;
     public $firstname;
@@ -38,30 +49,43 @@ class Client
                     $this->lastname = $mysqli->real_escape_string($value);
                     break;
                 case 'email':
-                    if (filter_var($value, FILTER_VALIDATE_EMAIL)){
-                        $this->email = $mysqli->real_escape_string($value);
+                    $email = $mysqli->real_escape_string($value);
+                    if (!$this->uniqueClientEmail($email)){
+                        echo ' Email is not unique.' . PHP_EOL;
                         break;
                     }
-                    echo 'email is not valid' . PHP_EOL;
+                    if (filter_var($value, FILTER_VALIDATE_EMAIL)){
+                        $this->email = $email;
+                        break;
+                    }
+                    echo ' Email is not valid.' . PHP_EOL;
                     break;
                 case 'phonenumber1':
+                    if ($value === ""){ 
+                        unset($this->phonenumber1);
+                        break;
+                    }
                     $number = str_replace(" ", "+", $value);
                     if ($validation->validatePhoneNumber($number)){
                         $this->phonenumber1 = $mysqli->real_escape_string($number);
                         break;
                     }
-                    echo 'Phone number 1 is not valid' . PHP_EOL;
+                    echo ' Phone number 1 is not a valid Lithuanian phone no.' . PHP_EOL;
                     break;
                 case 'phonenumber2':
+                    if ($value === "") break;
                     $number = str_replace(" ", "+", $value);
                     if ($validation->validatePhoneNumber($number)){
                         $this->phonenumber2 = $mysqli->real_escape_string($number);
                         break;
                     }
-                    echo 'Phone number 2 is not valid' . PHP_EOL;
+                    echo ' Phone number 2 is not valid' . PHP_EOL;
                     break;
                 case 'comment':
                     $this->comment = $mysqli->real_escape_string($value);
+                    break;
+                case 'file':
+                    $this->file = $value;
                     break;
             }
         }
@@ -71,19 +95,19 @@ class Client
     {
         $errors = FALSE;
         if (!isset($this->firstname)){
-            $this->message .= ' First name has to be set when adding new client.';
+            $this->message .= ' First name has to be set when adding new client.' . PHP_EOL;
             $errors = TRUE;
         }
         if (!isset($this->lastname)){
-            $this->message .= ' Last name has to be set when adding new client.';
+            $this->message .= ' Last name has to be set when adding new client.' . PHP_EOL;
             $errors = TRUE;
         }
         if (!isset($this->email)){
-            $this->message .= ' Email name has to be set when adding new client.';
+            $this->message .= ' Unique and valid email has to be set when adding new client.' . PHP_EOL;
             $errors = TRUE;
         }
         if (!isset($this->phonenumber1)){
-            $this->message .= ' First phone number has to be set when adding new client.';
+            $this->message .= ' We need a valid first phone number to add new client.' . PHP_EOL;
             $errors = TRUE;
         }
         if ($errors) 
@@ -94,7 +118,9 @@ class Client
         if (!$mysqli->query($query)) {
             printf("Error: %s\n", $mysqli->error);
         }
-        $this->message = "Succesfully added new client, ID set to $mysqli->insert_id";
+        else {
+            $this->message = " Succesfully added new client, ID set to $mysqli->insert_id";
+        }
         return $this->message;
     }
 
@@ -133,7 +159,13 @@ class Client
 
     public function import()
     {
-        return 'succesfully deleted user '. $this->firstname;
+        $import = new Import;
+        $clients = $import->importClientCSV($this->file);
+        foreach ($clients as $client){
+            $clientArray = array_combine($this->arrayStructure, $client);
+            $insert = new Self($clientArray);
+            echo $insert->insert();
+        }
     }
 
     private function updateQuery($column, $field)
@@ -143,5 +175,16 @@ class Client
         if (!$mysqli->query($query)) {
             printf("Error: %s\n", $mysqli->error);
         } 
+    }
+
+    private function uniqueClientEmail($email)
+    {
+        $mysqli = new mysqli($this->dbserver, $this->dbuser, $this->dbpass, $this->dbname);
+        $query = "SELECT * FROM client WHERE email = '$email'";
+        $result = $mysqli->query($query);
+        if ($result->num_rows > 0){
+            return FALSE;
+        }
+        return TRUE;
     }
 }
