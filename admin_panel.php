@@ -1,11 +1,10 @@
 <?php
-parse_str(implode('&', array_slice($argv, 1)), $_GET);
-
+parse_str( implode('&', array_slice($argv, 1)), $_GET);
 require_once 'Client.php';
 
 if(!isset($_GET['action'])) 
     echo "Please define action. action must be import, insert, update or delete";
-
+var_dump($_GET);
 switch ($_GET['action'])
 {
     case 'insert':

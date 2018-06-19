@@ -10,6 +10,8 @@ class Client
     private $dbpass = '';
     private $dbname = 'cms';
 
+    private $message;
+
     public $id;
     public $firstname;
     public $lastname;
@@ -40,21 +42,23 @@ class Client
                         $this->email = $mysqli->real_escape_string($value);
                         break;
                     }
-                    echo 'email is not valid';
+                    echo 'email is not valid' . PHP_EOL;
                     break;
                 case 'phonenumber1':
-                    if ($validation->validateEmail($value)){
-                        $this->phonenumber1 = $mysqli->real_escape_string($value);
+                    $number = str_replace(" ", "+", $value);
+                    if ($validation->validatePhoneNumber($number)){
+                        $this->phonenumber1 = $mysqli->real_escape_string($number);
                         break;
                     }
-                    echo 'Phone number 1 is not valid';
+                    echo 'Phone number 1 is not valid' . PHP_EOL;
                     break;
                 case 'phonenumber2':
-                if ($validation->validateEmail($value)){
-                        $this->phonenumber2 = $mysqli->real_escape_string($value);
+                    $number = str_replace(" ", "+", $value);
+                    if ($validation->validatePhoneNumber($number)){
+                        $this->phonenumber2 = $mysqli->real_escape_string($number);
                         break;
                     }
-                    echo 'Phone number 2 is not valid';
+                    echo 'Phone number 2 is not valid' . PHP_EOL;
                     break;
                 case 'comment':
                     $this->comment = $mysqli->real_escape_string($value);
@@ -65,13 +69,33 @@ class Client
 
     public function insert()
     {
+        $errors = FALSE;
+        if (!isset($this->firstname)){
+            $this->message .= ' First name has to be set when adding new client.';
+            $errors = TRUE;
+        }
+        if (!isset($this->lastname)){
+            $this->message .= ' Last name has to be set when adding new client.';
+            $errors = TRUE;
+        }
+        if (!isset($this->email)){
+            $this->message .= ' Email name has to be set when adding new client.';
+            $errors = TRUE;
+        }
+        if (!isset($this->phonenumber1)){
+            $this->message .= ' First phone number has to be set when adding new client.';
+            $errors = TRUE;
+        }
+        if ($errors) 
+            return $this->message;
         $mysqli = new mysqli($this->dbserver, $this->dbuser, $this->dbpass, $this->dbname);
         $query ="INSERT INTO client (firstname, lastname, email, phonenumber1, phonenumber2, comment) VALUES
                                             ('$this->firstname', '$this->lastname', '$this->email', '$this->phonenumber1', '$this->phonenumber2', '$this->comment')";
         if (!$mysqli->query($query)) {
             printf("Error: %s\n", $mysqli->error);
         }
-        return $query;
+        $this->message = "Succesfully added new client, ID set to $mysqli->insert_id";
+        return $this->message;
     }
 
     public function delete()
