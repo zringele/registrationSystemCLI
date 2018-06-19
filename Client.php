@@ -38,7 +38,7 @@ class Client
                     $this->lastname = $mysqli->real_escape_string($value);
                     break;
                 case 'email':
-                    if ($validation->validateEmail($value)){
+                    if (filter_var($value, FILTER_VALIDATE_EMAIL)){
                         $this->email = $mysqli->real_escape_string($value);
                         break;
                     }

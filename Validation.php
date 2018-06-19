@@ -13,11 +13,4 @@ class Validation
         return FALSE;
    }
 
-   public function validateEmail($email)
-   {
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return FALSE;
-        }
-        return TRUE;
-   }
 }
