@@ -6,10 +6,10 @@ php admin_panel.php action=insert
 ```
 
 Action can be one of the following
-*insert
-*update
-*delete
-*import
+* insert
+* update
+* delete
+* import
 
 **INSERT**
 
