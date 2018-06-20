@@ -1,4 +1,4 @@
-** HOW TO USE **
+**HOW TO USE**
 Your CLI command have to state the action you want to use like this:
 ```
 php admin_panel.php action=insert
@@ -10,7 +10,7 @@ Action can be one of the following
 *delete
 *import
 
-** insert **
+**insert**
 Fields to set:
 
 *firstname - required
