@@ -130,8 +130,12 @@ class Client
         $query = "DELETE FROM client WHERE id = $this->id";
         if (!$mysqli->query($query)) {
             printf("Error: %s\n", $mysqli->error);
+            $this->message = ' Delete action was not successfull.';
         }
-        return $query;
+        else {
+            $this->message = ' Delete action was successfull.';            
+        }
+        return $this->message;
     }
 
     public function update()
@@ -154,7 +158,7 @@ class Client
         if (isset($this->comment)) {
             $this->updateQuery('comment', $this->comment);
         }
-        return $query;
+        return $this->message;
     }
 
     public function import()

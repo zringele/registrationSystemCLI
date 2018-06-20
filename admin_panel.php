@@ -4,7 +4,6 @@ require_once 'Client.php';
 
 if(!isset($_GET['action'])) 
     echo "Please define action. action must be import, insert, update or delete";
-var_dump($_GET);
 switch ($_GET['action'])
 {
     case 'insert':
